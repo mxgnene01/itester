@@ -16,7 +16,7 @@ import json
 import requests
 from nose.tools import assert_equal
 from common.parameterized import parameterized
-from common.tools import assert_dict_str_contains, prepareStrToDict, prepareRequestsParam, testLoader, fromExcelGetAllCase
+from common.tools import assertDictContains, prepareStrToDict, prepareRequestsParam, testLoader, fromExcelGetAllCase
 
 TEST_GET_CASE = TEST_POST_CASE = []
 
@@ -69,7 +69,7 @@ class test_iterster():
         if func == 'assert_equal':
             assert_equal(expect_value, response.content)
         elif func == 'assert_in':
-            error_lists = assert_dict_str_contains(json.loads(expect_value), response.json(), err_list=[])
+            error_lists = assertDictContains(json.loads(expect_value), response.json(), err_list=[])
             if len(error_lists) > 0:
                 raise AssertionError(",".join(error_lists))
             else:
@@ -112,7 +112,7 @@ class test_iterster():
         if func == 'assert_equal':
             assert_equal(json.loads(expect_value), response.json())
         elif func == 'assert_in':
-            error_lists = assert_dict_str_contains(json.loads(expect_value), response.json(), err_list=[])
+            error_lists = assertDictContains(json.loads(expect_value), response.json(), err_list=[])
             if len(error_lists) > 0:
                 raise AssertionError(",".join(error_lists))
             else:

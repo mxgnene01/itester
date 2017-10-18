@@ -35,7 +35,7 @@ def testLoader(path, pattern="test_*.xlsx"):
     return glob.glob(pattern)
 
 
-def assert_dict_str_contains(expect_data, real_data, path='', err_list=[]):
+def assertDictContains(expect_data, real_data, path='', err_list=[]):
     ''' 两个dict ，list， sting 比对'''
     if isinstance(expect_data, (list, tuple)):
         for index, value in enumerate(expect_data):
@@ -50,7 +50,7 @@ def assert_dict_str_contains(expect_data, real_data, path='', err_list=[]):
                     else:
                         err_list.append("%s.%s" % (path, str(index)))
                 else:
-                    err_list = assert_dict_str_contains(value, real_data[index], path + '.' + str(index), err_list)
+                    err_list = assertDictContains(value, real_data[index], path + '.' + str(index), err_list)
             except Exception, e:
                 logging.error(str(e))
     elif isinstance(expect_data, dict):
@@ -66,7 +66,7 @@ def assert_dict_str_contains(expect_data, real_data, path='', err_list=[]):
                     else:
                         err_list.append("%s.%s" % (path, key))
                 else:
-                    err_list = assert_dict_str_contains(value, real_data[key], "%s.%s" % (path, key), err_list)
+                    err_list = assertDictContains(value, real_data[key], "%s.%s" % (path, key), err_list)
             except Exception, e:
                 logging.error("dict compare error")
     else:
