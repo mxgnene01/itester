@@ -14,3 +14,8 @@
 ```
 nosetests -s -v test_main.py --with-html --html-report=result/a.html
 ```
+
+## 原理
+
+- 使用 `nose` 自带的html插件及功能来发现case，执行case
+- 使用 `parameterized` 进行case 的参数化
