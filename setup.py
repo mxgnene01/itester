@@ -24,17 +24,15 @@ def _setup():
         author_email='mxgnene01@gmail.com',
         install_requires=['requests', 'click', 'xlrd'],
         packages=['itester'],
+        license='LICENSE',
+        url='https://github.com/mxgnene01/itester',
         include_package_data=True,
+        long_description=open('README.md').read(),
         entry_points={
             'console_scripts': [
                 'itester=itester.itester:main',
                 ]
-            },
-        classifiers=[
-            'Development Status :: 4 - Beta Development Status',
-            'Environment :: Console',
-            'Topic :: Utilities',
-        ],
+            }
     )
 
 def main():

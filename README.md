@@ -9,6 +9,17 @@
 
 看了不少测试环境 py.test、nose、unittest 对于QA 来说，书写case 需要写代码，所以简单写了一个使用Excel 维护case 的工具
 
+## 安装
+
+```
+pip install itester
+
+or
+
+make build
+make install
+```
+
 ## 使用命令
 
 ```
