@@ -130,11 +130,10 @@ def main(casepath, mailto, outputpath, prefix):
 
     if case_error:
         log.error('测试用合法性检查失败，请检查~')
-
-    time_end = time.time()
-    time_cost = time_end - time_start
-
-    log.info("测试完成，通过测试用例数：%s, 失败用例数：%s, 异常用例数：%s, 执行测试用例耗时：%s 秒" % (pass_no, fail_no, err_no, time_cost)  )
+    else:
+        time_end = time.time()
+        time_cost = time_end - time_start
+        log.info("测试完成，通过测试用例数：%s, 失败用例数：%s, 异常用例数：%s, 执行测试用例耗时：%s 秒" % (pass_no, fail_no, err_no, time_cost)  )
 
     if fail_no > 0 or err_no > 0:
         html_name = 'report%s.html' % str(int(time.time()))
