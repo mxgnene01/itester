@@ -141,7 +141,10 @@ def main(casepath, mailto, outputpath, prefix):
         html_full_name = os.path.join(outputpath, html_name)
         html_report = htmlreporter(html_full_name, case_html_output)
         html_report.make_report()
-        sendmail(mailto.split(','), prefix + html_name)
+        if prefix:
+            sendmail(mailto.split(','), prefix + html_name)
+        else:
+            sendmail(mailto.split(','), html_full_name)
 
 if __name__ == '__main__':
     main()
