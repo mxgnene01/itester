@@ -22,7 +22,6 @@ TEST_GET_CASE = TEST_POST_CASE = []
 
 basepath = os.path.dirname(os.path.abspath(__file__))
 
-print basepath
 for casefile in testLoader(os.path.join(basepath, 'testcase')):
     # 多个case文件进行case 合并
     TEST_GET_CASE = TEST_GET_CASE + fromExcelGetAllCase(casefile, 'GET')
