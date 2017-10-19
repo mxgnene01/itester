@@ -24,7 +24,7 @@ def _setup():
         author_email='mxgnene01@gmail.com',
         install_requires=['requests', 'click', 'xlrd'],
         packages=['itester'],
-        license='LICENSE',
+        license='GNU',
         url='https://github.com/mxgnene01/itester',
         include_package_data=True,
         long_description=open('README.md').read(),
