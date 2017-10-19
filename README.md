@@ -2,7 +2,7 @@
 
 ## 要求
 
-- nose
+- click
 - requests
 
 ## 介绍
@@ -12,10 +12,10 @@
 ## 使用命令
 
 ```
-nosetests -s -v test_main.py --with-html --html-report=result/a.html
+itester -c /path/testcase/ -m mail1@mail.com,mail2@mail.com -o /path/report/ -p http://url/auto/report/
 ```
 
 ## 原理
 
-- 使用 `nose` 自带的html插件及功能来发现case，执行case
-- 使用 `parameterized` 进行case 的参数化
+- 从excel中获取case
+- 然后分别校验实际返回值和预计返回值的区别
