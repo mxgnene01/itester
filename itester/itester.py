@@ -85,10 +85,10 @@ def runTests(name, desc, use_yn, method, url, headers, cookies, params, expect_v
     return error_lists
 
 @click.command()
-@click.option('-c', '--casepath', default='./', help=u'case路径')
+@click.option('-c', '--casepath', default='./', help=u'case路径，默认当前路径')
 @click.option('-m', '--mailto', help=u'收件人列表，使用逗号分割')
-@click.option('-o', '--outputpath', default='./', help=u'测试报告输出路径')
-@click.option('-p', '--prefix', help=u'邮件内容中的url的前缀')
+@click.option('-o', '--outputpath', default='./', help=u'测试报告输出路径，默认当前路径')
+@click.option('-p', '--prefix', help=u'邮件内容中的url的前缀, 如不输入发送附件')
 def main(casepath, mailto, outputpath, prefix):
     '''Excel - driven interface automation framework'''
     time_start = time.time()
