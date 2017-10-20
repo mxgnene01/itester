@@ -10,6 +10,7 @@
 # +--+--+--+--+--+--+--+--+--+--+--+--+--+
 #                        2017/10/19  下午2:13
 
+from tools import encodeutf8
 
 REPORT_TITTLE = "测试报告"
 REPORT_CONTENT = "自动化测试报告"
@@ -50,8 +51,8 @@ class htmlreporter():
         for idx, val in enumerate(self.column_values):
             # 协程处理时结果顺序不确定，不再设置默认用例名称
             # case_name=val[0].replace('<','&lt;').replace('>','&gt;') if val[0] else '用例'+str(idx+1)
-            case_name = self.encodeutf8(val[0].replace('<', '&lt;').replace('>', '&gt;') if val[0] else '')
-            case_content = self.encodeutf8(val[1].replace('<', '&lt;').replace('>', '&gt;') if val[1] else '测试通过')
+            case_name = encodeutf8(val[0].replace('<', '&lt;').replace('>', '&gt;') if val[0] else '')
+            case_content = encodeutf8(val[1].replace('<', '&lt;').replace('>', '&gt;') if val[1] else '测试通过')
             if val[2] == 0:
                 case_res = '测试失败'
                 fail_no += 1
@@ -61,7 +62,7 @@ class htmlreporter():
             else:
                 case_res = '执行异常'
                 err_no += 1
-            case_msg = self.encodeutf8(val[3] if val[3] else '测试通过')
+            case_msg = encodeutf8(val[3] if val[3] else '测试通过')
             tr_str = '''<tr>
                             <td>%s</td>
                             <td>%s</td>
@@ -81,17 +82,6 @@ class htmlreporter():
                         </tr>
                     ''' % (len(self.column_values), pass_no, fail_no, err_no)
         return table_begin + table_val + table_count + table_end
-
-    def encodeutf8(self, strname):
-        '''对字符串进行处理，始终输出str 类型'''
-        if isinstance(strname, unicode):
-            strname = strname.encode('utf8')
-        elif isinstance(strname, str):
-            strname = strname
-        else:
-            raise TypeError("value not unicode or str!")
-
-        return strname
 
     # 生成网页源码
     def make_report(self):

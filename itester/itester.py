@@ -12,10 +12,12 @@
 
 
 import os
+import sys
 import time
 import json
 import click
 import requests
+from common.tools import encodeutf8
 from common.html_report import htmlreporter
 from common.termlogcolor import log
 from common.tools import (
@@ -39,11 +41,11 @@ def checkCase(*args):
     case_err = False
     if args[3] not in ("POST", 'GET'):
         case_err = True
-        log.error("接口的Method 必须是POST、GET，请检查测试用例： %s" % args[0])
+        log.error("接口的Method 必须是POST、GET，请检查测试用例： %s" % encodeutf8(args[0]))
 
     if len(args[4]) <= 0:
         case_err = True
-        log.error("确认URL正确，请检查测试用例： %s" % args[0])
+        log.error("确认URL正确，请检查测试用例： %s" % encodeutf8(args[0]))
 
     return case_err
 
@@ -78,9 +80,9 @@ def runTests(name, desc, use_yn, method, url, headers, cookies, params, expect_v
             response = requests.post(url, headers=headers_dict, cookies=cookies_dict, data=params_dict)
 
     if func == 'assert_equal':
-        error_lists = assertDictContains(expect_value, response.content, u'节点：', err_list=[])
+        error_lists = assertDictContains(expect_value, response.content, u'node：', err_list=[])
     elif func == 'assert_in':
-        error_lists = assertDictContains(json.loads(expect_value), response.json(), u'节点：' , err_list=[])
+        error_lists = assertDictContains(json.loads(expect_value), response.json(), u'node：', err_list=[])
 
     return error_lists
 
@@ -89,7 +91,8 @@ def runTests(name, desc, use_yn, method, url, headers, cookies, params, expect_v
 @click.option('-m', '--mailto', help=u'收件人列表，使用逗号分割')
 @click.option('-o', '--outputpath', default='./', help=u'测试报告输出路径，默认当前路径')
 @click.option('-p', '--prefix', help=u'邮件内容中的url的前缀, 如不输入发送附件')
-def main(casepath, mailto, outputpath, prefix):
+@click.option('-s', '--stmp', default='stmp.126.com,mail1@126.com,password', help=u'MacOs 上邮件服务的配置')
+def main(casepath, mailto, outputpath, prefix, stmp):
     '''Excel - driven interface automation framework'''
     time_start = time.time()
     pass_no = fail_no = err_no = 0
@@ -107,26 +110,27 @@ def main(casepath, mailto, outputpath, prefix):
                 if res_lists:
                     fail_no += 1
                     res_flag = 0
-                    log.error(u"用例：%s - 实际结果与预期结果不一致，测试失败，结果如下：" % case[1])
-                    log.error(",".join(res_lists))
+                    log.error("用例：%s - 实际结果与预期结果不一致，测试失败，结果如下：" % encodeutf8(case[1]))
+                    log.error(encodeutf8(",".join(res_lists)))
                 else:
                     pass_no += 1
                     res_flag = 1
-                    log.info(u"用例：%s - 实际结果与预期结果一致，测试通过" % case[1])
+                    log.info("用例：%s - 实际结果与预期结果一致，测试通过" % encodeutf8(case[1]))
             except Exception as e:
                 err_no += 1
                 res_flag = 2
-                res_lists.append(u"用例：%s - 执行异常，异常信息:" % case[1])
+                res_lists.append("用例：%s - 执行异常，异常信息:" % encodeutf8(case[1]))
                 log.error("执行异常，信息：%s " % str(e))
             finally:
                 for idx1, val1 in enumerate(res_lists):
                     res_lists[idx1] = val1.replace('<', '&lt;').replace('>', '&gt;')
 
-                res_lists = '<br>'.join(res_lists) if len(res_lists) else '测试通过'
+                res_lists = encodeutf8('<br>'.join(res_lists) if len(res_lists) else '测试通过')
                 case_html_output.append([case[0], case[1], res_flag, res_lists])
 
         if case_error:
             log.error('测试用例合法性检查失败，请检查~')
+            sys.exit(111)
         else:
             time_end = time.time()
             time_cost = time_end - time_start
@@ -142,9 +146,10 @@ def main(casepath, mailto, outputpath, prefix):
         html_report = htmlreporter(html_full_name, case_html_output)
         html_report.make_report()
         if prefix:
-            sendmail(mailto.split(','), prefix + html_name)
+            sendmail(mailto.split(','), stmp.split(','), prefix + html_name)
         else:
-            sendmail(mailto.split(','), html_full_name)
+            sendmail(mailto.split(','), stmp.split(','), attachment=html_full_name)
+        sys.exit(fail_no + err_no)
 
 if __name__ == '__main__':
     main()

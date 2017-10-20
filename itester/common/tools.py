@@ -36,6 +36,18 @@ def testLoader(path, pattern="test_*.xlsx"):
     return glob.glob(pattern)
 
 
+def encodeutf8(strname):
+    '''对字符串进行处理，始终输出str 类型'''
+    if isinstance(strname, unicode):
+        strname = strname.encode('utf8')
+    elif isinstance(strname, str):
+        strname = strname
+    else:
+        raise TypeError("value not unicode or str!")
+
+    return strname
+
+
 def assertDictContains(expect_data, real_data, path='', err_list=[]):
     ''' dict ，list， sting 比对'''
     if isinstance(expect_data, (list, tuple)):
@@ -71,7 +83,7 @@ def assertDictContains(expect_data, real_data, path='', err_list=[]):
             except Exception as e:
                 logging.error(str(e))
     else:
-        if not expect_data.decode('utf-8') == real_data.decode('utf-8'):
+        if not expect_data == real_data:
             err_list.append("%s.%s" % (path, expect_data))
 
     return err_list
@@ -111,7 +123,7 @@ def prepareRequestsParam(param, ofs='&'):
     else:
         return {}
 
-def sendmail(send_to, text, attachment=''):
+def sendmail(send_to, stmpconf, text='' ,attachment=''):
     import smtplib
     from os.path import basename
     from email.mime.application import MIMEApplication
@@ -121,7 +133,7 @@ def sendmail(send_to, text, attachment=''):
     from socket import gethostname
 
     send_from = 'sysadmin@%s' % (gethostname())
-    text = """Greetings,
+    mailtext = """Greetings,
 
 Please see your test report %s .
 
@@ -135,7 +147,7 @@ Thank you!
     msg['Date'] = formatdate(localtime=True)
     msg['Subject'] = u'自动化测试报告'
 
-    msg.attach(MIMEText(text))
+    msg.attach(MIMEText(mailtext))
 
     if attachment:
         with open(attachment, "rb") as f:
@@ -148,8 +160,8 @@ Thank you!
         smtp = smtplib.SMTP('127.0.0.1')
     else:
         smtp = smtplib.SMTP()
-        smtp.connect('', 25)
-        smtp.login('', '')
+        smtp.connect(stmpconf[0], 25)
+        smtp.login(stmpconf[1], stmpconf[2])
 
     smtp.sendmail(send_from, send_to, msg.as_string())
     smtp.close()
