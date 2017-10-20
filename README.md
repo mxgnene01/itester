@@ -12,6 +12,15 @@
 
 开发过程中考虑了使用jenkins 调用的情况，输出的日志会有彩色标识
 
+
+## 更新LOG
+
+- [1.0.5] : 1、更新中文处理方式 2、更新Mac 下-s 参数
+
+## TODO
+
+- Excel 中增加setup SQL/teardown SQL
+
 ## 安装
 
 ```
