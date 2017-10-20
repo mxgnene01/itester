@@ -3,6 +3,7 @@
 ## 依赖
 
 - xlrd
+- nose
 - click
 - requests
 
