@@ -6,6 +6,7 @@
 - nose
 - click
 - requests
+- nose-html-reporting
 
 ## 介绍
 

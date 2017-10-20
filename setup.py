@@ -22,7 +22,7 @@ def _setup():
         description='Excel - driven interface automation framework',
         author='Xiangguo Meng',
         author_email='mxgnene01@gmail.com',
-        install_requires=['requests', 'click', 'xlrd'],
+        install_requires=['requests', 'click', 'xlrd', 'nose', 'nose-html-reporting'],
         packages=['itester'],
         license='GNU',
         url='https://github.com/mxgnene01/itester',
