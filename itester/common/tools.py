@@ -40,7 +40,7 @@ def encodeutf8(strname):
     '''对字符串进行处理，始终输出str 类型'''
     if isinstance(strname, unicode):
         strname = strname.encode('utf8')
-    elif isinstance(strname, str):
+    elif isinstance(strname, (str, int)):
         strname = strname
     else:
         raise TypeError("value not unicode or str!")
@@ -61,7 +61,9 @@ def assertDictContains(expect_data, real_data, path='', err_list=[]):
                     if value == real_data[index]:
                         continue
                     else:
-                        err_list.append("%s.%s" % (path, str(index)))
+                        err_list.append("%s.%s：预期值：%s %s, 实际值：%s %s 对比不一致"
+                                        % (encodeutf8(path), str(index), encodeutf8(value), str(type(value)),
+                                           encodeutf8(real_data[index]), str(type(real_data[index]))))
                 else:
                     err_list = assertDictContains(value, real_data[index], path + '.' + str(index), err_list)
             except Exception, e:
@@ -77,14 +79,16 @@ def assertDictContains(expect_data, real_data, path='', err_list=[]):
                     if value == real_data[key]:
                         continue
                     else:
-                        err_list.append("%s.%s" % (path, key))
+                        err_list.append("%s.%s：预期值：%s %s, 实际值：%s %s 对比不一致"
+                                        % (encodeutf8(path), encodeutf8(key), encodeutf8(value), str(type(value)),
+                                           encodeutf8(real_data[key]), str(type(real_data[key]))))
                 else:
                     err_list = assertDictContains(value, real_data[key], "%s.%s" % (path, key), err_list)
             except Exception as e:
                 logging.error(str(e))
     else:
         if not expect_data == real_data:
-            err_list.append("%s.%s" % (path, expect_data))
+            err_list.append("预期值：%s %s, 实际值：%s %s 对比不一致" % (expect_data, str(type(expect_data)), real_data, str(type(real_data))))
 
     return err_list
 

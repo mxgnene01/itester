@@ -111,7 +111,7 @@ def main(casepath, mailto, outputpath, prefix, stmp):
                     fail_no += 1
                     res_flag = 0
                     log.error("用例：%s - 实际结果与预期结果不一致，测试失败，结果如下：" % encodeutf8(case[1]))
-                    log.error(encodeutf8(",".join(res_lists)))
+                    log.error(encodeutf8("\n".join(res_lists)))
                 else:
                     pass_no += 1
                     res_flag = 1
