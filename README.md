@@ -15,7 +15,7 @@
 
 ## 更新LOG
 
-- [1.0.5] : 1、更新中文处理方式 2、更新Mac 下-s 参数
+- [1.0.5] : 1、更新中文处理方式 2、更新Mac 下-s 参数 3、增加casepath 从环境变量ITESTER_CASE_PATH中获取
 
 ## TODO
 
@@ -43,7 +43,7 @@ itester --help
 ```
 
 ```
-Usage: itester.py [OPTIONS]
+Usage: itester [OPTIONS]
 
   Excel - driven interface automation framework
 
@@ -57,6 +57,7 @@ Options:
 
 ### 运行测试
 
+#### itester 运行方式
 建议在-o 的路径上增加nginx 的配置，配合使用-p 参数，发送的邮件中变只发一个访问的url
 
 ```
@@ -65,6 +66,12 @@ itester -c /path/testcase/ -m mail1@mail.com,mail2@mail.com -o /path/report/ -p 
 or
 
 itester -c /path/testcase/ -m mail1@mail.com,mail2@mail.com -o /path/report/
+```
+
+#### nosetests 的运行方式
+
+```
+export ITESTER_CASE_PATH="/path/excel_autotest/"; cd /path/itester/itester; nosetests -s -v test_main.py --with-html --html-report=/path/result/test_report.html
 ```
 
 ## 原理

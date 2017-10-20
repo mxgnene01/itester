@@ -17,7 +17,8 @@ import requests
 from common.parameterized import parameterized
 from common.tools import assertDictContains, prepareStrToDict, prepareRequestsParam, findAllFile, encodeutf8
 
-TEST_CASES = findAllFile(os.path.join(os.path.dirname(os.path.abspath(__file__)), '../testcase'))
+path = os.getenv('ITESTER_CASE_PATH', os.path.join(os.path.dirname(os.path.abspath(__file__)), '../testcase'))
+TEST_CASES = findAllFile(path)
 
 class test_iterster():
     '''
