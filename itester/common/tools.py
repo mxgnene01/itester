@@ -35,6 +35,13 @@ def testLoader(path, pattern="test_*.xlsx"):
     os.chdir(path)
     return glob.glob(pattern)
 
+def findAllFile(path):
+    all_case = []
+    for casefile in testLoader(path):
+        # 多个case文件进行case 合并
+        all_case = all_case + fromExcelGetAllCase(casefile, 'GET') + fromExcelGetAllCase(casefile, 'POST')
+    return all_case
+
 
 def encodeutf8(strname):
     '''对字符串进行处理，始终输出str 类型'''

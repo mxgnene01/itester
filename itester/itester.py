@@ -10,7 +10,6 @@
 # +--+--+--+--+--+--+--+--+--+--+--+--+--+
 #                        2017/10/19  上午10:05
 
-
 import os
 import sys
 import time
@@ -24,18 +23,9 @@ from common.tools import (
     assertDictContains,
     prepareStrToDict,
     prepareRequestsParam,
-    testLoader,
-    fromExcelGetAllCase,
+    findAllFile,
     sendmail
 )
-
-def findAllFile(path):
-    all_case = []
-    for casefile in testLoader(path):
-        # 多个case文件进行case 合并
-        all_case = all_case + fromExcelGetAllCase(casefile, 'GET') + fromExcelGetAllCase(casefile, 'POST')
-    return all_case
-
 
 def checkCase(*args):
     case_err = False
