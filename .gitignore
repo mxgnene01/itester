@@ -1,6 +1,7 @@
 # custum
 *html
 *.xlsx
+.file
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
