@@ -81,8 +81,7 @@ def runTests(name, desc, use_yn, method, url, headers, cookies, params, expect_v
 @click.option('-m', '--mailto', help='收件人列表，使用逗号分割')
 @click.option('-o', '--outputpath', default='./', help='测试报告输出路径，默认当前路径')
 @click.option('-p', '--prefix', help='邮件内容中的url的前缀, 如不输入发送附件')
-@click.option('-s', '--stmp', default='stmp.126.com,mail1@126.com,password', help='MacOs 上邮件服务的配置')
-def main(casepath, mailto, outputpath, prefix, stmp):
+def main(casepath, mailto, outputpath, prefix):
     '''Excel - driven interface automation framework'''
     time_start = time.time()
     pass_no = fail_no = err_no = 0
@@ -132,9 +131,9 @@ def main(casepath, mailto, outputpath, prefix, stmp):
         html_report = htmlreporter(html_full_name, case_html_output)
         html_report.make_report()
         if prefix:
-            sendmail(mailto.split(','), stmp.split(','), prefix + html_name)
+            sendmail(send_to=mailto.split(','), title='接口自动报告', content=prefix + html_name)
         else:
-            sendmail(mailto.split(','), stmp.split(','), attachment=html_full_name)
+            sendmail(mailto.split(','), title='接口自动报告', attachment=html_full_name)
         sys.exit(fail_no + err_no)
 
 if __name__ == '__main__':

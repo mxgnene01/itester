@@ -135,7 +135,7 @@ def sendmail(send_to, cc_to=list(), content='邮件内容', title='邮件标题'
             part['Content-Disposition'] = 'attachment; filename="%s"' % name
             msg.attach(part)
     username = sendconf.get('username', 'npc@daling.com')
-    password = sendconf.get('password', 'eayXG06H')
+    password = sendconf.get('password', '')
     smtp = smtplib.SMTP('smtp.exmail.qq.com')
     smtp.login(username, password)
     smtp.sendmail(username, send_to + cc_to, msg.as_string())
