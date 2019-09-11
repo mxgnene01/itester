@@ -15,7 +15,7 @@ import nose
 import json
 import requests
 from common.parameterized import parameterized
-from common.tools import assertDictContains, prepareStrToDict, prepareRequestsParam, findAllFile, encodeutf8
+from common.tools import cmp_dict, prepareStrToDict, prepareRequestsParam, findAllFile
 
 path = os.getenv('ITESTER_CASE_PATH', os.path.join(os.path.dirname(os.path.abspath(__file__)), '../testcase'))
 TEST_CASES = findAllFile(path)
@@ -68,11 +68,11 @@ class test_iterster():
                 response = requests.post(url, headers=headers_dict, cookies=cookies_dict, data=params_dict)
 
         if func == 'assert_equal':
-            error_lists = assertDictContains(expect_value, response.content, u'node：', err_list=[])
+            error_dict = cmp_dict(expect_value, response.content, u'node：', diff=dict())
         elif func == 'assert_in':
-            error_lists = assertDictContains(json.loads(expect_value), response.json(), u'node：', err_list=[])
+            error_dict = cmp_dict(json.loads(expect_value), response.json(), u'node：', diff=dict())
 
-        if len(error_lists) > 0:
+        if len(error_dict) > 0:
             raise AssertionError("%s error" % name)
         else:
             return

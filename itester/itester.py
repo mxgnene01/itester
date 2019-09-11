@@ -16,11 +16,10 @@ import time
 import json
 import click
 import requests
-from common.tools import encodeutf8
 from common.html_report import htmlreporter
 from common.termlogcolor import log
 from common.tools import (
-    assertDictContains,
+    cmp_dict,
     prepareStrToDict,
     prepareRequestsParam,
     findAllFile,
@@ -31,11 +30,11 @@ def checkCase(*args):
     case_err = False
     if args[3] not in ("POST", 'GET'):
         case_err = True
-        log.error("接口的Method 必须是POST、GET，请检查测试用例： %s" % encodeutf8(args[0]))
+        log.error("接口的Method 必须是POST、GET，请检查测试用例： %s" % args[0])
 
     if len(args[4]) <= 0:
         case_err = True
-        log.error("确认URL正确，请检查测试用例： %s" % encodeutf8(args[0]))
+        log.error("确认URL正确，请检查测试用例： %s" % args[0])
 
     return case_err
 
@@ -70,18 +69,19 @@ def runTests(name, desc, use_yn, method, url, headers, cookies, params, expect_v
             response = requests.post(url, headers=headers_dict, cookies=cookies_dict, data=params_dict)
 
     if func == 'assert_equal':
-        error_lists = assertDictContains(expect_value, response.content, u'node：', err_list=[])
+        error_dict = cmp_dict(expect_value, response.content, 'node：', diff=dict())
     elif func == 'assert_in':
-        error_lists = assertDictContains(json.loads(expect_value), response.json(), u'node：', err_list=[])
+        error_dict = cmp_dict(json.loads(expect_value), response.json(), 'node：', diff=dict())
 
-    return error_lists
+    return error_dict
+
 
 @click.command()
-@click.option('-c', '--casepath', default='./', help=u'case路径，默认当前路径')
-@click.option('-m', '--mailto', help=u'收件人列表，使用逗号分割')
-@click.option('-o', '--outputpath', default='./', help=u'测试报告输出路径，默认当前路径')
-@click.option('-p', '--prefix', help=u'邮件内容中的url的前缀, 如不输入发送附件')
-@click.option('-s', '--stmp', default='stmp.126.com,mail1@126.com,password', help=u'MacOs 上邮件服务的配置')
+@click.option('-c', '--casepath', default='./', help='case路径，默认当前路径')
+@click.option('-m', '--mailto', help='收件人列表，使用逗号分割')
+@click.option('-o', '--outputpath', default='./', help='测试报告输出路径，默认当前路径')
+@click.option('-p', '--prefix', help='邮件内容中的url的前缀, 如不输入发送附件')
+@click.option('-s', '--stmp', default='stmp.126.com,mail1@126.com,password', help='MacOs 上邮件服务的配置')
 def main(casepath, mailto, outputpath, prefix, stmp):
     '''Excel - driven interface automation framework'''
     time_start = time.time()
@@ -95,28 +95,24 @@ def main(casepath, mailto, outputpath, prefix, stmp):
         for case in all_case:
             case_error = checkCase(*case)
             try:
-                res_lists = []
-                res_lists = runTests(*case)
-                if res_lists:
+                res_dict = dict()
+                res_dict = runTests(*case)
+                if res_dict:
                     fail_no += 1
                     res_flag = 0
-                    log.error("用例：%s - 实际结果与预期结果不一致，测试失败，结果如下：" % encodeutf8(case[1]))
-                    log.error(encodeutf8("\n".join(res_lists)))
+                    log.error("用例：%s - 实际结果与预期结果不一致，测试失败，结果如下：" % case[1])
+                    log.error(res_dict)
                 else:
                     pass_no += 1
                     res_flag = 1
-                    log.info("用例：%s - 实际结果与预期结果一致，测试通过" % encodeutf8(case[1]))
+                    log.info("用例：%s - 实际结果与预期结果一致，测试通过" % case[1])
             except Exception as e:
                 err_no += 1
                 res_flag = 2
-                res_lists.append("用例：%s - 执行异常，异常信息:" % encodeutf8(case[1]))
                 log.error("执行异常，信息：%s " % str(e))
             finally:
-                for idx1, val1 in enumerate(res_lists):
-                    res_lists[idx1] = val1.replace('<', '&lt;').replace('>', '&gt;')
-
-                res_lists = encodeutf8('<br>'.join(res_lists) if len(res_lists) else '测试通过')
-                case_html_output.append([case[0], case[1], res_flag, res_lists])
+                res_dict = res_dict if len(res_dict) else '测试通过'
+                case_html_output.append([case[0], case[1], res_flag, res_dict])
 
         if case_error:
             log.error('测试用例合法性检查失败，请检查~')

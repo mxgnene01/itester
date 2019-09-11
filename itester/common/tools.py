@@ -43,61 +43,19 @@ def findAllFile(path):
     return all_case
 
 
-def encodeutf8(strname):
-    '''对字符串进行处理，始终输出str 类型'''
-    if isinstance(strname, unicode):
-        strname = strname.encode('utf8')
-    elif isinstance(strname, (str, int)):
-        strname = strname
+def cmp_dict(src_data, dst_data, path='', diff=list()):
+    if isinstance(src_data, dict):
+        for key in src_data:
+            newpath = path + '.' + key
+            if key in dst_data:
+                diff = cmp_dict(src_data[key], dst_data[key], newpath, diff)
+            else:
+                diff[newpath] = [src_data.get(key), 'not exist is key']
     else:
-        raise TypeError("value not unicode or str!")
+        if src_data != dst_data:
+            diff[path] = [src_data, dst_data]
 
-    return strname
-
-
-def assertDictContains(expect_data, real_data, path='', err_list=[]):
-    ''' dict ，list， sting 比对'''
-    if isinstance(expect_data, (list, tuple)):
-        for index, value in enumerate(expect_data):
-            try:
-                if not isinstance(value, (list, dict, tuple)):
-                    # decode to unicode for diff
-                    if isinstance(value, str):
-                        value = value.decode('utf-8')
-
-                    if value == real_data[index]:
-                        continue
-                    else:
-                        err_list.append("%s.%s：预期值：%s %s, 实际值：%s %s 对比不一致"
-                                        % (encodeutf8(path), str(index), encodeutf8(value), str(type(value)),
-                                           encodeutf8(real_data[index]), str(type(real_data[index]))))
-                else:
-                    err_list = assertDictContains(value, real_data[index], path + '.' + str(index), err_list)
-            except Exception, e:
-                logging.error(str(e))
-    elif isinstance(expect_data, dict):
-        for key, value in expect_data.items():
-            try:
-                if not isinstance(value, (list, dict, tuple)):
-                    # decode to unicode for diff
-                    if isinstance(value, str):
-                        value = value.decode('utf-8')
-
-                    if value == real_data[key]:
-                        continue
-                    else:
-                        err_list.append("%s.%s：预期值：%s %s, 实际值：%s %s 对比不一致"
-                                        % (encodeutf8(path), encodeutf8(key), encodeutf8(value), str(type(value)),
-                                           encodeutf8(real_data[key]), str(type(real_data[key]))))
-                else:
-                    err_list = assertDictContains(value, real_data[key], "%s.%s" % (path, key), err_list)
-            except Exception as e:
-                logging.error(str(e))
-    else:
-        if not expect_data == real_data:
-            err_list.append("预期值：%s %s, 实际值：%s %s 对比不一致" % (expect_data, str(type(expect_data)), real_data, str(type(real_data))))
-
-    return err_list
+    return diff
 
 
 def prepareStrToDict(strname, ofs='\n'):
@@ -134,7 +92,19 @@ def prepareRequestsParam(param, ofs='&'):
     else:
         return {}
 
-def sendmail(send_to, stmpconf, text='' ,attachment=''):
+def sendmail(send_to, cc_to=list(), content='邮件内容', title='邮件标题', attachment='', sendconf=dict(), ishtml=False):
+    '''
+    发送短信工具类
+    :param send_to: 收件人列表, 栗子如下：
+                    RECEIVERS = ['mengxiangguo<mengxiangguo@daling.com>', '陈韬炼'<chentaolian@daling.com>]
+    :param cc_to: 抄送人列表
+    :param content: 发件内容
+    :param title: 标题
+    :param attachment: 附近路径
+    :param sendconf: 发件人用户名和密码
+    :param ishtml: 内容是否网页
+    :return: None
+    '''
     import smtplib
     from os.path import basename
     from email.mime.application import MIMEApplication
@@ -143,22 +113,20 @@ def sendmail(send_to, stmpconf, text='' ,attachment=''):
     from email.utils import COMMASPACE, formatdate
     from socket import gethostname
 
-    send_from = 'sysadmin@%s' % (gethostname())
-    mailtext = """Greetings,
-
-Please see your test report %s .
-
-Thank you!
+    text = """ %s
 
 [%s]
-    """ % (text, gethostname() )
+    """ % (content, gethostname())
     msg = MIMEMultipart()
-    msg['From'] = send_from
+    msg['From'] = 'npc@daling.com'
     msg['To'] = COMMASPACE.join(send_to)
+    msg['Cc'] = COMMASPACE.join(cc_to)
     msg['Date'] = formatdate(localtime=True)
-    msg['Subject'] = u'自动化测试报告'
-
-    msg.attach(MIMEText(mailtext))
+    msg['Subject'] = '%s' % title
+    if not ishtml:
+        msg.attach(MIMEText(text, 'plain', 'utf-8'))
+    else:
+        msg.attach(MIMEText(content, _subtype='html', _charset='utf-8'))
 
     if attachment:
         with open(attachment, "rb") as f:
@@ -166,13 +134,15 @@ Thank you!
             part = MIMEApplication(f.read(), Name=name)
             part['Content-Disposition'] = 'attachment; filename="%s"' % name
             msg.attach(part)
-
-    if sys.platform.startswith('linux'):
-        smtp = smtplib.SMTP('127.0.0.1')
-    else:
-        smtp = smtplib.SMTP()
-        smtp.connect(stmpconf[0], 25)
-        smtp.login(stmpconf[1], stmpconf[2])
-
-    smtp.sendmail(send_from, send_to, msg.as_string())
+    username = sendconf.get('username', 'npc@daling.com')
+    password = sendconf.get('password', 'eayXG06H')
+    smtp = smtplib.SMTP('smtp.exmail.qq.com')
+    smtp.login(username, password)
+    smtp.sendmail(username, send_to + cc_to, msg.as_string())
     smtp.close()
+
+
+if __name__ == '__main__':
+    xx = {"111": '11', "23456": {"22222": 99949, "33333": "0000", "list": ["3333", "4444", "11"]}}
+    yy = {"111": '11', "23456": {"22222": 9999, "33333": "0000", "list": ["3333", "4444", "11"]}, 'key': "values"}
+    print(cmp_dict(xx, yy))
